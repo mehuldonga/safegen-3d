@@ -9,6 +9,15 @@
 
 ---
 
+## 📸 Interactive Digital Twin in Action
+
+### Use Case: Real-Time Dynamic Obstacle Replanning
+The screenshot below demonstrates the live interactive 3D environment where the generative diffusion model continuously computes safe trajectories. When a new dynamic obstacle (hazard) is introduced in real-time, the system leverages the Control Barrier Functions (CBFs) to instantly replan a collision-free path, showcasing the safety-first architecture of SAFEGEN 3D.
+
+![SAFEGEN 3D System Screenshot](docs/system_screenshot.png)
+
+---
+
 ## 🎯 What Was Reproduced vs. What Was Added
 
 In strict adherence to scientific integrity and research-to-code traceability:

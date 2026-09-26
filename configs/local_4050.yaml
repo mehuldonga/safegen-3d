@@ -1,0 +1,66 @@
+# SAFEGEN 3D — Configuration for NVIDIA RTX 4050 Laptop GPU (6GB VRAM)
+# Classification: [ADAPTATION FOR LOCAL HARDWARE]
+
+hardware:
+  device: "cuda"            # 'cuda' if torch.cuda.is_available() else 'cpu'
+  precision: "float32"
+  max_vram_gb: 6.0
+  allow_cpu_fallback: true
+  num_workers: 0
+
+diffusion:
+  horizon: 48               # Planning horizon (timesteps)
+  transition_dim: 4         # [pos_x, pos_y, vel_x, vel_y]
+  action_dim: 2             # [vel_x, vel_y]
+  observation_dim: 2        # [pos_x, pos_y]
+  model_dim: 64             # Base channel width (optimized for 6GB VRAM)
+  dim_mults: [1, 2, 4]      # UNet scale multipliers
+  n_diffusion_steps: 30     # Fast balanced sampling steps
+  predict_epsilon: true
+  loss_type: "l2"
+  beta_schedule: "cosine"   # Cosine noise schedule for cleaner trajectories
+
+performance_modes:
+  FAST_DEMO:
+    n_diffusion_steps: 15
+    cbf_active_steps: 10
+    solver: "closed_form"
+    batch_size: 1
+    horizon: 32
+  BALANCED:
+    n_diffusion_steps: 30
+    cbf_active_steps: 15
+    solver: "closed_form"
+    batch_size: 1
+    horizon: 48
+  RESEARCH:
+    n_diffusion_steps: 100
+    cbf_active_steps: 50
+    solver: "qp"
+    batch_size: 4
+    horizon: 64
+
+safety:
+  cbf_kappa: 1.0            # CBF contraction coefficient
+  t_bias: 5.0               # Sigmoid relaxation midpoint (t_bias - t)
+  margin_buffer: 0.05       # Safety margin buffer
+  default_solver: "closed_form" # "closed_form" or "qp"
+  max_cbf_iterations: 10
+  qp_tolerance: 1e-4
+
+simulation:
+  dt: 0.05                  # Simulation timestep (seconds)
+  max_steps: 200            # Max steps before mission timeout
+  goal_threshold: 0.25      # Distance to goal considered successful
+  collision_tolerance: 0.0  # Margin before collision logged
+  update_fps: 20            # Real-time WebSocket streaming rate
+
+backend:
+  host: "127.0.0.1"
+  port: 8000
+  cors_origins: ["http://localhost:5173", "http://127.0.0.1:5173"]
+
+frontend:
+  port: 5173
+  backend_api_url: "http://127.0.0.1:8000"
+  backend_ws_url: "ws://127.0.0.1:8000/ws/simulation"
